@@ -21,13 +21,9 @@ move cursol
 - Tab key insert tab for Lisp
 - BackSpace key delete backword char
 - Delete key delete forwaord char
-- Home key display top page
-- ESC |(SSH)
-- End key display end page
-- ESC /(SSH)
-- PageUp key PageUp
-- Ctrl+Y(SSH)
-- PageDown PageDown
-- Ctrl+V(SSH)
+- Home key display top page    ESC |(SSH)
+- End key display end page     ESC /(SSH)
+- PageUp key PageUp            Ctrl+Y(SSH)
+- PageDown PageDown            Ctrl+V(SSH)
 - ESC TAB completion.
 
