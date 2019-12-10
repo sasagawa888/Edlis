@@ -159,8 +159,6 @@ void edit_screen(char *fname){
         case 7:     ESCMOVE(2,1);    //ctrl+g help
                     ESCCLS1;
                     printf("This editor is referring to the nano editor.\n");
-                    printf("(edit filename)  invoke editor\n");
-                    printf("(edit nil)       invoke editor again\n");
                     printf("CTRL+Y  page up\n");
                     printf("CTRL+V  page down\n");
                     printf("CTRL+O  save file\n");
@@ -641,7 +639,7 @@ void edit_screen(char *fname){
 void display_command(char *fname){
     ESCHOME;
     ESCREV;
-    printf("Edlis editor         File: %s                                                     ", fname);
+    printf("Edlis 1.0        File: %s                                                     ", fname);
     ESCRST;
     return;
 }
