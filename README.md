@@ -24,7 +24,8 @@ Key bindings are hybrid of Emacs and nano.
 - CTRL+F  move to right
 - CTRL+B  move to left
 - CTRL+P  move to up
-- CTRL+B  move to down
+- CTRL+N  move to down
+- CTRL+J  end of line
 - CTRL+V  page up
 - ESC V   page down
 - CTRL+O  save file
