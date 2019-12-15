@@ -171,6 +171,8 @@ void signal_handler(int signo){
 
 void edit_screen(char *fname){
     int c,i,type;
+    char str[20];
+    struct position pos;
 
     ESCMOVE(ed_row+2 - ed_start, ed_col+1);
     i = 0;
@@ -252,6 +254,33 @@ void edit_screen(char *fname){
                     ESCMOVE(1,1);
                     return;
         case 22:    goto pageup;  //ctrl+V
+        case 23:    //CTRL+W
+                    ESCREV;
+                    ESCMOVE(ed_footer,1);
+                    printf("                                            ");
+                    ESCMOVE(ed_footer,1);
+                    printf("search? ");
+                    c = scanf("%s",str);
+                    c = getch();
+                    ESCRST;
+                    pos = findword(str);
+                    if(pos.row == -1){
+                        ESCREV;
+                        ESCMOVE(ed_footer,1);
+                        printf("can't find %s", str);
+                        ESCRST;
+                        ESCMOVE(ed_row+2-ed_start,ed_col+1);
+                        break;
+                    }
+                    ed_row = pos.row;
+                    ed_col = pos.col;
+                    ed_start = ed_row - ed_scroll/2;
+                    if(ed_start < 0){
+                        ed_start = 0;
+                    }
+	                display_screen();
+                    ESCMOVE(ed_row+2-ed_start,ed_col+1);
+                    break;
         case 12:             //CTRL+L
         case 31:    reinput: //CTRL+_
                     ESCREV;
@@ -1452,23 +1481,58 @@ void find_candidate(){
 }
 
 void replace_fragment(char* newstr){
-        char* oldstr;
-        int m,n;
+    char* oldstr;
+    int m,n;
 
-        oldstr = get_fragment();
-        m = strlen(oldstr);
-        n = strlen(newstr);
-        while(m>0){
-                backspace();
-                m--;
-        }
-        while(n>0){
-                insertcol();
-                ed_data[ed_row][ed_col] = *newstr;
-                ed_col++;
-                newstr++;
-                n--;
-        }
-        return;
+    oldstr = get_fragment();
+    m = strlen(oldstr);
+    n = strlen(newstr);
+    while(m>0){
+        backspace();
+        m--;
+    }
+    while(n>0){
+        insertcol();
+        ed_data[ed_row][ed_col] = *newstr;
+        ed_col++;
+        newstr++;
+        n--;
+    }
+    return;
 }
 
+struct position findword(char* word){
+    int i,j,k,len;
+    struct position pos; 
+
+    i = ed_row;
+    j = ed_col;
+    len = strlen(word);
+    while(i<=ed_end+1){
+        while(j<160){
+            if(ed_data[i][j] == NUL)
+                goto next1;
+            k = j;
+            while(k<j+len){
+                if(ed_data[i][k] != *word){
+                    goto next2;
+                }
+                word++;
+                k++;
+            }
+            pos.row = i;
+            pos.col = j;
+            return(pos);
+            
+            next2:
+            j++;
+        }
+        next1:
+        i++;
+        j = 0;
+    }
+    //can't find word
+    pos.row = -1;
+    pos.col = 0;
+    return(pos);
+}
