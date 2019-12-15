@@ -3,6 +3,7 @@
 #include <termios.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
+#include <signal.h>
 #include "edlis.h"
 
 
@@ -36,7 +37,7 @@ int ed_extended_color = 5; //default magenta
 int ed_string_color = 3;   //default yellow
 int ed_comment_color = 4;  //default blue
 int ed_incomment = -1;     // #|...|# comment
-
+int ctrl = 0;
 
 //special form token
 char special[40][12] = {
@@ -111,6 +112,9 @@ int main(int argc, char *argv[]){
     char *fname;
 
     fname = argv[1];
+    signal(SIGINT, signal_handler);
+    signal(SIGSTOP, signal_handler);
+    signal(SIGTSTP, signal_handler);
     for(i=0; i<4000; i++)
         for(j=0; j<160; j++)
             ed_data[i][j] = NUL;
@@ -159,6 +163,10 @@ int main(int argc, char *argv[]){
     ed_row = ed_col = 0;
     edit_screen(fname);
     return(0);
+}
+
+void signal_handler(int signo){
+   ctrl = signo;
 }
 
 void edit_screen(char *fname){

@@ -60,6 +60,7 @@ struct position{
 #define ESCBOLD printf("\33[1m")
 
 
+void signal_handler(int signo);
 void edit_screen(char *fname);
 void display_command(char *fname);
 void display_screen();
