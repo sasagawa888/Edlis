@@ -197,6 +197,7 @@ void edit_screen(char *fname){
                     printf("CTRL+K  cut selection\n");
                     printf("CTRL+U  uncut selection\n");
                     printf("CTRL+_ (or CTRL+L) goto line\n");
+                    printf("CTRL+W  search word\n");
                     printf("ESC TAB   complete name\n");
                     printf("ESC <   goto top page\n");
                     printf("ESC >   goto end page\n");

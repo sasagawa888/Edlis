@@ -14,8 +14,6 @@ col < 160
 # Command
 - CTR+O save file.
 - CTRL+X quit editor.
-- CTRL+K delete selection.
-- CTRL+U paste from clip board.
 
 # Editing
 Key bindings are hybrid of Emacs and nano.
@@ -41,6 +39,7 @@ Key bindings are hybrid of Emacs and nano.
 - CTRL+K  cut selection
 - CTRL+U  uncut selection
 - CTRL+L  goto line
+- CTRL+W  search word
 - ESC TAB   complete builtin function or syntax 
 - ESC <   goto top page
 - ESC >   goto end page
