@@ -7,6 +7,10 @@ It is minimum CUI editor for ISLisp
 
 e.g. ./edlis queens.lsp
 
+# limitation
+row < 4000
+col < 160
+
 # Command
 - CTR+O save file.
 - CTRL+X quit editor.
@@ -26,6 +30,10 @@ Key bindings are hybrid of Emacs and nano.
 - CTRL+P  move to up
 - CTRL+N  move to down
 - CTRL+J  end of line
+- CTRL+D  delete 
+- CTRL+H  backspace
+- CTRL+A  begin of line
+- CTRL+E  end of line
 - CTRL+V  page up
 - ESC V   page down
 - CTRL+O  save file
