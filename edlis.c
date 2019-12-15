@@ -259,7 +259,7 @@ void edit_screen(char *fname){
                     ESCMOVE(ed_footer,1);
                     printf("                                            ");
                     ESCMOVE(ed_footer,1);
-                    printf("search? ");
+                    printf("search: ");
                     c = scanf("%s",str);
                     c = getch();
                     ESCRST;
@@ -1503,10 +1503,12 @@ void replace_fragment(char* newstr){
 
 struct position findword(char* word){
     int i,j,k,len;
-    struct position pos; 
+    struct position pos;
+    char* word1; 
 
     i = ed_row;
     j = ed_col;
+    word1 = word;
     len = strlen(word);
     while(i<=ed_end+1){
         while(j<160){
@@ -1526,6 +1528,7 @@ struct position findword(char* word){
             
             next2:
             j++;
+            word = word1;
         }
         next1:
         i++;
