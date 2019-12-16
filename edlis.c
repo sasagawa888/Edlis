@@ -38,6 +38,7 @@ int ed_string_color = 3;   //default yellow
 int ed_comment_color = 4;  //default blue
 int ed_incomment = -1;     // #|...|# comment
 int ctrl = 0;
+int modify_flag = 0;
 
 //special form token
 char special[40][12] = {
@@ -230,6 +231,7 @@ void edit_screen(char *fname){
                     }
                     ed_col = i - 1;
                     ESCMOVE(ed_row+2 - ed_start, ed_col+1);
+                    modify_flag = 1;
                     break; 
         case 15:    save_data(fname); //ctrl+O
                     ESCMOVE(ed_footer,1);
@@ -237,6 +239,7 @@ void edit_screen(char *fname){
                     printf("saved");
                     ESCRST;
                     ESCMOVE(ed_row+2 - ed_start, ed_col+1);
+                    modify_flag = 0;
                     break; 
        case 11:     copy_selection(); //ctrl+K
                     delete_selection();
@@ -245,16 +248,47 @@ void edit_screen(char *fname){
                     restore_paren();
                     display_screen();
                     ESCMOVE(ed_row+2 - ed_start,ed_col+1);
+                    modify_flag = 1;
                     break;
         case 21:    paste_selection(); //ctrl+U
                     restore_paren();
                     display_screen();
                     ESCMOVE(ed_row+2 - ed_start,ed_col+1);
+                    modify_flag = 1;
                     break;
         case 24:    //ctrl+X
-                    ESCCLS; 
-                    ESCMOVE(1,1);
-                    return;
+                    if(modify_flag == 0){
+                        ESCCLS; 
+                        ESCMOVE(1,1);
+                        return;
+                    }
+                    else{
+                        ESCREV;
+                        ESCMOVE(ed_footer,1);
+                        printf("save modified buffer? ([Y]es/[N]o/[C]ancel) ");
+                        c = scanf("%c",str1);
+                        c = getch();
+                        ESCRST;
+                        if(*str1 == 'y'){
+                            save_data(fname);
+                            ESCCLS; 
+                            ESCMOVE(1,1);
+                            return;
+                        }
+                        else if(*str1 == 'n'){
+                            ESCCLS; 
+                            ESCMOVE(1,1);
+                            return;
+                        }
+                        else if(*str1 == 'c'){
+                            ESCREV;
+                            ESCMOVE(ed_footer,1);
+                            printf("                                 ");
+                            ESCRST;
+                            ESCMOVE(ed_row+2-ed_start,ed_col+1);
+                        }
+                    }
+                    break;
         case 22:    goto pageup;  //ctrl+V
         case 23:    //CTRL+W
                     ESCREV;
@@ -317,6 +351,7 @@ void edit_screen(char *fname){
                     }
                     display_screen();
                     ESCMOVE(ed_row+2 - ed_start, ed_col+1);
+                    modify_flag = 1;
                     break;
         case 12:             //CTRL+L
         case 31:    reinput: //CTRL+_
@@ -457,6 +492,7 @@ void edit_screen(char *fname){
                                     break;
                         case EOL:   ed_row++;
                                     printf("%c", c);
+                                    modify_flag = 1;
                                     break;
                         case DOWN:  down:
                                     if(ed_row == ed_end)
@@ -615,6 +651,7 @@ void edit_screen(char *fname){
                                     backspace();
                                     display_screen();
                                     ESCMOVE(ed_row+2 - ed_start,ed_col+1);
+                                    modify_flag = 1;
                                     break;
                     }
                     break;
@@ -662,6 +699,7 @@ void edit_screen(char *fname){
                         else
                             ESCMOVE(22,ed_col+1);
                     }
+                    modify_flag = 1;
                     break;
         case EOL:   if(ed_indent == 1)
                         i = calc_tabs();
@@ -701,6 +739,7 @@ void edit_screen(char *fname){
                          display_screen();
                          ESCMOVE(ed_row+2 - ed_start, ed_col+1);
                     }
+                    modify_flag = 1;
                     break;
         case TAB:   if(ed_tab == 0){
                         ed_col = 0;
@@ -713,6 +752,7 @@ void edit_screen(char *fname){
                     }
                     display_screen();
                     ESCMOVE(ed_row+2 - ed_start,ed_col+1);
+                    modify_flag = 1;
                     break;
         default:    if(ed_ins){
                         if(ed_col > 159)
@@ -759,6 +799,7 @@ void edit_screen(char *fname){
                             ed_col++;
                         }
                     }
+                    modify_flag = 1;
         }
     goto loop;
 }
@@ -767,7 +808,7 @@ void display_command(char *fname){
     int i;
     ESCHOME;
     ESCREV;
-    printf("Edlis 1.1        File: %s    ", fname);
+    printf("Edlis 1.2        File: %s    ", fname);
     for(i=31;i<ed_width;i++)
         printf(" ");
     ESCRST;
