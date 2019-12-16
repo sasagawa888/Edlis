@@ -171,7 +171,7 @@ void signal_handler(int signo){
 
 void edit_screen(char *fname){
     int c,i,type;
-    char str[20];
+    char str1[20],str2[20];
     struct position pos;
 
     ESCMOVE(ed_row+2 - ed_start, ed_col+1);
@@ -198,6 +198,7 @@ void edit_screen(char *fname){
                     printf("CTRL+U  uncut selection\n");
                     printf("CTRL+_ (or CTRL+L) goto line\n");
                     printf("CTRL+W  search word\n");
+                    printf("CTRL+R  replace word\n");
                     printf("ESC TAB   complete name\n");
                     printf("ESC <   goto top page\n");
                     printf("ESC >   goto end page\n");
@@ -261,14 +262,14 @@ void edit_screen(char *fname){
                     printf("                                            ");
                     ESCMOVE(ed_footer,1);
                     printf("search: ");
-                    c = scanf("%s",str);
+                    c = scanf("%s",str1);
                     c = getch();
                     ESCRST;
-                    pos = findword(str);
+                    pos = findword(str1);
                     if(pos.row == -1){
                         ESCREV;
                         ESCMOVE(ed_footer,1);
-                        printf("can't find %s", str);
+                        printf("can't find %s", str1);
                         ESCRST;
                         ESCMOVE(ed_row+2-ed_start,ed_col+1);
                         break;
@@ -281,6 +282,41 @@ void edit_screen(char *fname){
                     }
 	                display_screen();
                     ESCMOVE(ed_row+2-ed_start,ed_col+1);
+                    break;
+
+        case 18:    //CTRL+R
+                    ESCREV;
+                    ESCMOVE(ed_footer,1);
+                    printf("                                            ");
+                    ESCMOVE(ed_footer,1);
+                    printf("search: ");
+                    c = scanf("%s",str1);
+                    c = getch();
+                    ESCMOVE(ed_footer,1);
+                    printf("                                            ");
+                    ESCMOVE(ed_footer,1);
+                    printf("replace: ");
+                    c = scanf("%s",str2);
+                    c = getch();
+                    ESCRST;
+                    pos = findword(str1);
+                    if(pos.row == -1){
+                        ESCREV;
+                        ESCMOVE(ed_footer,1);
+                        printf("can't find %s", str1);
+                        ESCRST;
+                        ESCMOVE(ed_row+2-ed_start,ed_col+1);
+                        break;
+                    }
+                    ed_row = pos.row;
+                    ed_col = pos.col+strlen(str1);
+                    replace_fragment(str2);
+                    ed_start = ed_row - ed_scroll/2;
+                    if(ed_start < 0){
+                        ed_start = 0;
+                    }
+                    display_screen();
+                    ESCMOVE(ed_row+2 - ed_start, ed_col+1);
                     break;
         case 12:             //CTRL+L
         case 31:    reinput: //CTRL+_
