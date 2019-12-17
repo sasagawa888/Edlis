@@ -170,6 +170,23 @@ void signal_handler(int signo){
    ctrl = signo;
 }
 
+void input(char* str){
+    int c,pos;
+
+    pos = 0;
+    loop:
+    c = getc(stdin);
+    if(c == EOL){
+        str[pos] = NUL;
+        return;
+    }
+    else {
+        str[pos] = c;
+        pos++;
+        goto loop;
+    }
+}
+
 void edit_screen(char *fname){
     int c,i,type;
     char str1[20],str2[20];
@@ -263,29 +280,32 @@ void edit_screen(char *fname){
                         return;
                     }
                     else{
+                        retryX:
                         ESCREV;
                         ESCMOVE(ed_footer,1);
                         printf("save modified buffer? ([Y]es/[N]o/[C]ancel) ");
-                        c = scanf("%c",str1);
                         c = getch();
                         ESCRST;
-                        if(*str1 == 'y'){
+                        if(c == 'y'){
                             save_data(fname);
                             ESCCLS; 
                             ESCMOVE(1,1);
                             return;
                         }
-                        else if(*str1 == 'n'){
+                        else if(c == 'n'){
                             ESCCLS; 
                             ESCMOVE(1,1);
                             return;
                         }
-                        else if(*str1 == 'c'){
+                        else if(c == 'c'){
                             ESCREV;
                             ESCMOVE(ed_footer,1);
-                            printf("                                 ");
+                            printf("                                             ");
                             ESCRST;
                             ESCMOVE(ed_row+2-ed_start,ed_col+1);
+                        }
+                        else{
+                            goto retryX;
                         }
                     }
                     break;
@@ -296,8 +316,7 @@ void edit_screen(char *fname){
                     printf("                                            ");
                     ESCMOVE(ed_footer,1);
                     printf("search: ");
-                    c = scanf("%s",str1);
-                    c = getch();
+                    input(str1);
                     ESCRST;
                     pos = findword(str1);
                     if(pos.row == -1){
@@ -319,19 +338,19 @@ void edit_screen(char *fname){
                     break;
 
         case 18:    //CTRL+R
+                    memset(str1,NUL,20);
+                    memset(str2,NUL,20);
                     ESCREV;
                     ESCMOVE(ed_footer,1);
                     printf("                                            ");
                     ESCMOVE(ed_footer,1);
                     printf("search: ");
-                    c = scanf("%s",str1);
-                    c = getch();
+                    input(str1);
                     ESCMOVE(ed_footer,1);
                     printf("                                            ");
                     ESCMOVE(ed_footer,1);
                     printf("replace: ");
-                    c = scanf("%s",str2);
-                    c = getch();
+                    input(str2);
                     ESCRST;
                     pos = findword(str1);
                     if(pos.row == -1){

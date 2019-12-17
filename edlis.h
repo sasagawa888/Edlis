@@ -61,6 +61,7 @@ struct position{
 
 
 void signal_handler(int signo);
+void input(char* str);
 void edit_screen(char *fname);
 void display_command(char *fname);
 void display_screen();
