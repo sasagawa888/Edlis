@@ -356,6 +356,7 @@ void edit_screen(char *fname){
                         ESCREV;
                         ESCMOVE(ed_footer,1);
                         printf("                      ");
+                        ESCMOVE(ed_footer,1);
                         printf("can't find %s", str1);
                         ESCRST;
                         ESCMOVE(ed_row+2-ed_start,ed_col+1);
