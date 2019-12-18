@@ -177,7 +177,7 @@ void input(char* str){
     loop:
     c = getc(stdin);
     if(c == EOL){
-        str[pos] = NUL;
+        str[pos] = '\0';
         return;
     }
     else {
@@ -338,8 +338,6 @@ void edit_screen(char *fname){
                     break;
 
         case 18:    //CTRL+R
-                    memset(str1,NUL,20);
-                    memset(str2,NUL,20);
                     ESCREV;
                     ESCMOVE(ed_footer,1);
                     printf("                                            ");
@@ -352,25 +350,53 @@ void edit_screen(char *fname){
                     printf("replace: ");
                     input(str2);
                     ESCRST;
+                    retry1R:
                     pos = findword(str1);
                     if(pos.row == -1){
                         ESCREV;
                         ESCMOVE(ed_footer,1);
+                        printf("                      ");
                         printf("can't find %s", str1);
                         ESCRST;
                         ESCMOVE(ed_row+2-ed_start,ed_col+1);
                         break;
                     }
-                    ed_row = pos.row;
-                    ed_col = pos.col+strlen(str1);
-                    replace_fragment(str2);
-                    ed_start = ed_row - ed_scroll/2;
-                    if(ed_start < 0){
-                        ed_start = 0;
+                    else{
+                        ed_row = pos.row;
+                        ed_col = pos.col;
+                        ed_start = ed_row - ed_scroll/2;
+                        if(ed_start < 0){
+                            ed_start = 0;
+                        }
+                        display_screen();
+                        ESCMOVE(ed_row+2 - ed_start, ed_col+1);
+                        ESCREV;
+                        printf("%s",str1);
+                        ESCMOVE(ed_footer,1);
+                        printf("                                            ");
+                        ESCMOVE(ed_footer,1);
+                        retry2R:
+                        printf("replace? [Y]es/[N]o ");
+                        ESCRST;
+                        c = getch();
+                        if(c == 'y'){
+                            ed_row = pos.row;
+                            ed_col = pos.col;
+                            replaceword(str1,str2);
+                            display_screen();
+                            modify_flag = 1;
+                            ed_col++;
+                            goto retry1R;
+                        }
+                        else if(c == 'n'){
+                            display_screen();
+                            ed_col++;
+                            goto retry1R;
+                        }
+                        else{
+                            goto retry2R;
+                        }
                     }
-                    display_screen();
-                    ESCMOVE(ed_row+2 - ed_start, ed_col+1);
-                    modify_flag = 1;
                     break;
         case 12:             //CTRL+L
         case 31:    reinput: //CTRL+_
@@ -1635,4 +1661,48 @@ struct position findword(char* word){
     pos.row = -1;
     pos.col = 0;
     return(pos);
+}
+
+
+void replaceword(char* str1, char* str2){
+    int len1,len2,i,j;
+
+    len1 = strlen(str1);
+    len2 = strlen(str2);
+
+    if(len1 == len2){
+        for(i=0;i<len1;i++){
+            ed_data[ed_row][ed_col] = *str2;
+            ed_col++;
+            str2++;
+        }
+    }
+    else if (len1 > len2){
+        i = ed_col + len1;
+        j = len1 - len2;
+        while(ed_data[ed_row][i] != NUL){
+            ed_data[ed_row][i-j] = ed_data[ed_row][i];
+            i++; 
+        }
+        ed_data[ed_row][i] = NUL;
+
+        for(i=0;i<len2;i++){
+            ed_data[ed_row][ed_col+i] = *str2;
+            str2++;
+        }
+    }
+    else { //len1 < len2
+        i = findeol(ed_row);
+        j = len2 - len1;
+        while(i >= ed_col+len1){
+            ed_data[ed_row][i+j] = ed_data[ed_row][i];
+            i--; 
+        }
+        ed_data[ed_row][i] = NUL;
+
+        for(i=0;i<len2;i++){
+            ed_data[ed_row][ed_col+i] = *str2;
+            str2++;
+        }
+    }
 }

@@ -93,3 +93,4 @@ char* get_fragment();
 void find_candidate();
 void replace_fragment(char* newstr);
 struct position findword(char* word);
+void replaceword(char* str1, char* str2);
