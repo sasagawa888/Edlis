@@ -318,7 +318,7 @@ void edit_screen(char *fname){
                     printf("search: ");
                     input(str1);
                     ESCRST;
-                    pos = findword(str1);
+                    pos = find_word(str1);
                     if(pos.row == -1){
                         ESCREV;
                         ESCMOVE(ed_footer,1);
@@ -351,7 +351,7 @@ void edit_screen(char *fname){
                     input(str2);
                     ESCRST;
                     retry1R:
-                    pos = findword(str1);
+                    pos = find_word(str1);
                     if(pos.row == -1){
                         ESCREV;
                         ESCMOVE(ed_footer,1);
@@ -383,7 +383,7 @@ void edit_screen(char *fname){
                         if(c == 'y'){
                             ed_row = pos.row;
                             ed_col = pos.col;
-                            replaceword(str1,str2);
+                            replace_word(str1,str2);
                             display_screen();
                             modify_flag = 1;
                             ed_col++;
@@ -1625,7 +1625,7 @@ void replace_fragment(char* newstr){
     return;
 }
 
-struct position findword(char* word){
+struct position find_word(char* word){
     int i,j,k,len;
     struct position pos;
     char* word1; 
@@ -1665,7 +1665,7 @@ struct position findword(char* word){
 }
 
 
-void replaceword(char* str1, char* str2){
+void replace_word(char* str1, char* str2){
     int len1,len2,i,j;
 
     len1 = strlen(str1);
