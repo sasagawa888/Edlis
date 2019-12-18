@@ -283,7 +283,7 @@ void edit_screen(char *fname){
                         retryX:
                         ESCREV;
                         ESCMOVE(ed_footer,1);
-                        printf("save modified buffer? ([Y]es/[N]o/[C]ancel) ");
+                        printf("save modified buffer? y/n/c ");
                         c = getch();
                         ESCRST;
                         if(c == 'y'){
@@ -377,7 +377,7 @@ void edit_screen(char *fname){
                         printf("                                            ");
                         ESCMOVE(ed_footer,1);
                         retry2R:
-                        printf("replace? [Y]es/[N]o ");
+                        printf("replace? y/n ");
                         ESCRST;
                         c = getch();
                         if(c == 'y'){

@@ -1,5 +1,5 @@
 # Edlis
-Edlis is a edtor for Easy-ISLisp.
+Edlis is a editor for Easy-ISLisp.
 It is minimum CUI editor for ISLisp
 
 # Invoke editor
@@ -34,8 +34,6 @@ Key bindings are hybrid of Emacs and nano.
 - CTRL+E  end of line
 - CTRL+V  page up
 - ESC V   page down
-- CTRL+O  save file
-- CTRL+X  quit from editor
 - CTRL+K  cut selection
 - CTRL+U  uncut selection
 - CTRL+L  goto line
