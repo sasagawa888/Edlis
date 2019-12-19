@@ -14,10 +14,10 @@ col <= 160
 # Command
 - CTR+O save file.
 - CTRL+X quit editor.
+- CTRL+T insert file.
 
 # Editing
 Key bindings are hybrid of Emacs and nano.
-- ESC A mark current row position. After this operation, cursol up or down reverse selected rows. ESC A again, unmark. Similer to nano editor
 - Enter key insert tab for Lisp automatic
 - Insert key switch insert/overwrite
 - Tab key insert tab for Lisp
@@ -43,6 +43,7 @@ Key bindings are hybrid of Emacs and nano.
 - ESC <   goto top page
 - ESC >   goto end page
 - ESC A   mark(or unmark) row for selection
+ESC A mark current row position. After this operation, cursol up or down reverse selected rows. ESC A again, unmark. Similer to nano editor.
 
 - ←　→　↑　↓　key is avarable
 - Home key display top page 

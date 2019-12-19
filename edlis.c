@@ -20,8 +20,8 @@ int ed_ins = 1;
 int ed_tab = 0;
 int ed_indent = 1;
 int ed_name = NIL;
-char ed_data[4000][160];
-char ed_copy[500][160];
+char ed_data[ROW_SIZE][COL_SIZE];
+char ed_copy[COPY_SIZE][COL_SIZE];
 int ed_lparen_row;
 int ed_lparen_col;
 int ed_rparen_row;
@@ -116,8 +116,8 @@ int main(int argc, char *argv[]){
     signal(SIGINT, signal_handler);
     signal(SIGSTOP, signal_handler);
     signal(SIGTSTP, signal_handler);
-    for(i=0; i<4000; i++)
-        for(j=0; j<160; j++)
+    for(i=0; i<ROW_SIZE; i++)
+        for(j=0; j<COL_SIZE; j++)
             ed_data[i][j] = NUL;
     port = fopen(fname,"r");
 
@@ -144,12 +144,12 @@ int main(int argc, char *argv[]){
             if(c == EOL){
                 ed_row++;
                 ed_col = 0;
-                if(ed_row >= 1000)
+                if(ed_row >= ROW_SIZE)
                     printf("row %d over max-row", ed_row);
             }
             else{
                 ed_col++;
-                if(ed_col >= 160)
+                if(ed_col >= COL_SIZE)
                    printf("row %d over max-column", ed_col);
             }
             c = getc(port);
@@ -191,13 +191,14 @@ void edit_screen(char *fname){
     int c,i,type;
     char str1[20],str2[20];
     struct position pos;
+    FILE *port;
 
     ESCMOVE(ed_row+2 - ed_start, ed_col+1);
     i = 0;
     loop:
     c = getch();
     switch(c){
-        case 7:     ESCMOVE(2,1);    //ctrl+g help
+        case 7:     ESCMOVE(2,1);    //ctrl+G help
                     ESCCLS1;
                     printf("*** Edlis help ***\n");
                     printf("Key bindings are hybrid of Emacs and nano.\n");
@@ -211,6 +212,7 @@ void edit_screen(char *fname){
                     printf("CTRL+V  page up\n");
                     printf("ESC V   page down\n");
                     printf("CTRL+O  save file\n");
+                    printf("CTRL+T  insert file\n");
                     printf("CTRL+X  quit from editor\n");
                     printf("CTRL+K  cut selection\n");
                     printf("CTRL+U  uncut selection\n");
@@ -235,6 +237,42 @@ void edit_screen(char *fname){
                     goto down;
         case 8:     //ctrl+H
                     goto backspace;
+        case 20:     //ctrl+T
+                    retryQ:
+                    ESCREV;
+                    ESCMOVE(ed_footer,1);
+                    printf("                                            ");
+                    ESCMOVE(ed_footer,1);
+                    printf("filename: ");
+                    input(str1);
+                    ESCRST;
+                    port = fopen(str1,"r");
+                    if(port == NULL)
+                        goto retryQ;
+                    if(port != NULL){
+                        c = fgetc(port);
+                        while(c != EOF){
+                        ed_data[ed_row][ed_col] = c;
+                        if(c == EOL){
+                            ed_row++;
+                            ed_col = 0;
+                            if(ed_row >= ROW_SIZE)
+                                printf("row %d over max-row", ed_row);
+                        }
+                        else{
+                            ed_col++;
+                        if(ed_col >= COL_SIZE)
+                            printf("row %d over max-column", ed_col);
+                        }
+                    c = getc(port);
+                    }
+                    ed_end = ed_row;
+                    ed_data[ed_end][0] = EOL;
+                        fclose(port);
+                    }
+                    display_screen();
+                    modify_flag = 1;
+                    break;
         case 4:     //ctrl+D
                     goto delete;
         case 1:     //ctrl+A
@@ -1075,7 +1113,7 @@ void backspace(){
         ed_rparen_row = -1;
     }
     i = ed_col;
-    while(i <= 160){
+    while(i <= COL_SIZE){
         ed_data[ed_row][i-1] = ed_data[ed_row][i];
         i++;
     }
@@ -1098,12 +1136,12 @@ void insertrow(){
     int i,j,k;
 
     for(i=ed_end; i>=ed_row; i--){
-        for(j=0; j<160; j++){
+        for(j=0; j<COL_SIZE; j++){
             ed_data[i+1][j] = ed_data[i][j];
         }
     }
     k = 0;
-    for(j=ed_col; j<160; j++){
+    for(j=ed_col; j<COL_SIZE; j++){
         ed_data[ed_row+1][k] = ed_data[ed_row][j];
         k++;
     }
@@ -1115,7 +1153,7 @@ void deleterow(){
     int i,j,k,l;
 
     k = l = findeol(ed_row-1);
-    for(j=0; j<160; j++){
+    for(j=0; j<COL_SIZE; j++){
         ed_data[ed_row-1][k] = ed_data[ed_row][j];
         k++;
         if(ed_data[ed_row][j] == EOL)
@@ -1123,7 +1161,7 @@ void deleterow(){
     }
 
     for(i=ed_row; i<ed_end; i++){
-        for(j=0; j<160; j++){
+        for(j=0; j<COL_SIZE; j++){
             ed_data[i][j] = ed_data[i+1][j];
         }
     }
@@ -1138,7 +1176,7 @@ void deleterow(){
 int findeol(int row){
     int i;
 
-    for(i=0; i<160; i++){
+    for(i=0; i<COL_SIZE; i++){
         if(ed_data[row][i] == EOL)
             return(i);
     }
@@ -1455,7 +1493,7 @@ int calc_tabs(){
 void copy_selection(){
     int i,j,k;
 
-    if(ed_clip_end - ed_clip_start > 500)
+    if(ed_clip_end - ed_clip_start > COPY_SIZE)
         return;
 
     j = 0;
@@ -1635,7 +1673,7 @@ struct position find_word(char* word){
     word1 = word;
     len = strlen(word);
     while(i<=ed_end+1){
-        while(j<160){
+        while(j<COL_SIZE){
             if(ed_data[i][j] == NUL)
                 goto next1;
             k = j;

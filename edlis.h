@@ -1,3 +1,7 @@
+#define ROW_SIZE 4000
+#define COL_SIZE  160
+#define COPY_SIZE 500
+
 
 #define NIL     0
 
