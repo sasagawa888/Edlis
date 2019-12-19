@@ -238,7 +238,6 @@ void edit_screen(char *fname){
         case 8:     //ctrl+H
                     goto backspace;
         case 20:     //ctrl+T
-                    retryQ:
                     ESCREV;
                     ESCMOVE(ed_footer,1);
                     printf("                                            ");
@@ -247,8 +246,16 @@ void edit_screen(char *fname){
                     input(str1);
                     ESCRST;
                     port = fopen(str1,"r");
-                    if(port == NULL)
-                        goto retryQ;
+                    if(port == NULL){
+                        ESCREV;
+                        ESCMOVE(ed_footer,1);
+                        printf("                                            ");
+                        ESCMOVE(ed_footer,1);
+                        printf("%s not exist", str1);
+                        ESCRST;
+                        ESCMOVE(ed_row+2 - ed_start, ed_col+1);
+                        break;
+                    }
                     if(port != NULL){
                         c = fgetc(port);
                         while(c != EOF){
