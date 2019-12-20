@@ -422,7 +422,7 @@ void edit_screen(char *fname){
                         printf("                                            ");
                         ESCMOVE(ed_footer,1);
                         retry2R:
-                        printf("replace? y/n ");
+                        printf("replace? y/n/c ");
                         ESCRST;
                         c = getch();
                         if(c == 'y'){
@@ -438,6 +438,11 @@ void edit_screen(char *fname){
                             display_screen();
                             ed_col++;
                             goto retry1R;
+                        }
+                        else if(c == 'c'){
+                            display_screen();
+                            ESCMOVE(ed_row+2 - ed_start, ed_col+1);
+                            break;
                         }
                         else{
                             goto retry2R;
