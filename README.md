@@ -12,7 +12,7 @@ row <= 4000
 col <= 160
 
 # Command
-- CTR+O save file.
+- CTRL+O save file.
 - CTRL+X quit editor.
 - CTRL+T insert file.
 
